@@ -43,6 +43,7 @@
 
   *{ margin:0; padding:0; box-sizing:border-box; }
 
+  html, body{ overflow-x:hidden; max-width:100%; }
   html{ scroll-behavior:smooth; }
 
   body{
@@ -161,8 +162,11 @@
   /* ---- countdown ---- */
   .countdown{
     display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
     gap:clamp(1rem,4vw,2.8rem);
     margin-top:3.2rem;
+    max-width:100%;
   }
   .cd-unit{ min-width:62px; }
   .cd-num{
@@ -268,7 +272,7 @@
   .details{ text-align:center; }
   .detail-cards{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));
     gap:2rem;
     max-width:1000px;
     margin:6vh auto 0;
@@ -345,7 +349,7 @@
   }
   .hotels{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));
     gap:2rem;
     max-width:1000px;
     margin:0 auto;
@@ -408,6 +412,9 @@
     section{ padding:11vh 7vw; }
     .envelope{ --w:min(86vw,330px); }
     .seal{ width:64px; height:64px; font-size:1.3rem; }
+    .countdown{ gap:clamp(.55rem,3.5vw,1.4rem); }
+    .cd-unit{ min-width:52px; }
+    .cd-num{ font-size:clamp(1.8rem,7vw,2.6rem); }
   }
 
   /* ============ ENVELOPE INTRO ============ */
@@ -420,7 +427,7 @@
   }
   #env-overlay .env-eyebrow{
     font-family:'Jost',sans-serif; letter-spacing:.5em; text-transform:uppercase;
-    font-size:.74rem; color:var(--sage-deep);
+    font-size:.74rem; color:var(--sage-deep); position:relative; z-index:5;
   }
   .env-stage{ perspective:1400px; }
   .envelope{
@@ -432,7 +439,7 @@
   .env-back{ position:absolute; inset:0; border-radius:6px;
     background:linear-gradient(160deg, var(--sage-light), var(--sage)); }
   .letter{
-    position:absolute; left:6%; top:6%; width:88%; height:118%;
+    position:absolute; left:6%; top:6%; width:88%; height:92%;
     background:linear-gradient(180deg,#ffffff,var(--cream));
     border-radius:4px; z-index:1;
     box-shadow:0 6px 18px rgba(59,70,54,.12);
@@ -459,7 +466,7 @@
     border:2px solid rgba(255,255,255,.28);
     animation:sealPulse 2.4s ease-in-out infinite; }
   @keyframes sealPulse{ 0%,100%{ transform:translate(-50%,-50%) scale(1);} 50%{ transform:translate(-50%,-50%) scale(1.07);} }
-  .tap-hint{ font-family:'Jost',sans-serif; letter-spacing:.34em; text-transform:uppercase; font-size:.7rem; color:var(--sage-deep); }
+  .tap-hint{ font-family:'Jost',sans-serif; letter-spacing:.34em; text-transform:uppercase; font-size:.7rem; color:var(--sage-deep); position:relative; z-index:5; }
   body.locked{ overflow:hidden; height:100svh; }
 </style>
 </head>
