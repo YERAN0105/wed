@@ -56,31 +56,42 @@
     line-height:1.7;
     -webkit-font-smoothing:antialiased;
   }
-  .lily-bg{
-  position:fixed;
-  inset:0;
+.lily-bg{
+  position:absolute;
+  top:0;
+  left:0;
 
   width:100%;
-  height:100%;
+  height:69vh;
 
   background-image:var(--lily);
 
-  background-size:cover;
-  background-position:center;
+  background-size:115%;
+  background-position:center top;
   background-repeat:no-repeat;
+  
+  animation:lilyMove 18s linear infinite alternate;
 
-  opacity:0.38;
+  opacity:1;
 
   z-index:-3;
 
-  filter:
-    blur(2px)
-    brightness(0.45)
-    contrast(1.1);
-
-  transform:scale(1.05);
+  filter:none;
 
   pointer-events:none;
+}
+@keyframes lilyMove{
+
+  0%{
+    background-position:center top;
+    transform:scale(1);
+  }
+
+  100%{
+    background-position:center bottom;
+    transform:scale(1.12);
+  }
+
 }
   /* ---- 3D canvas background ---- */
   #bg{
@@ -91,17 +102,22 @@
     z-index:0;
     display:block;
   }
-  .bg-gradient{
-  position:fixed;
-  inset:0;
+ .bg-gradient{
+  position:absolute;
+  top:0;
+  left:0;
+
+  width:100%;
+  height:70vh;
+
   z-index:-1;
 
   background:
     linear-gradient(
-      rgba(247,246,240,0.72),
-      rgba(230,235,223,0.78)
+      rgba(0,0,0,0.38),
+      rgba(0,0,0,0.45)
     );
-  }
+}
   /* subtle film grain for texture */
   .grain{
     position:fixed;
@@ -164,6 +180,7 @@
     font-size:clamp(3.6rem, 14vw, 9rem);
     line-height:.95;
     font-weight:400;
+    
   }
   .hero .amp{
     display:block;
@@ -473,15 +490,28 @@
   font-size:clamp(.6rem,2.6vw,.8rem);
   color:#f3efe7;
   text-shadow:0 2px 14px rgba(0,0,0,.65);
-  margin:0;
+  transform:translateY(27px);
+  opacity:0;
+  animation:fadeOnly 0.8s ease forwards;
+  animation-delay:0.5s;
+  animation-fill-mode:forwards;
 }
 
   .env-title{
-    font-family:'Great Vibes','Pinyon Script',cursive; color:#fff; font-weight:400;
-    font-size:clamp(2.7rem,13vw,5.4rem); line-height:1;
+    font-family:'Pinyon Script',cursive;
+    color:#e6e2e2;
+    font-weight:400;
+    font-size:clamp(2.7rem,13vw,5.4rem);
+    line-height:1;
+
     text-shadow:0 4px 28px rgba(0,0,0,.55);
-    margin-bottom: -2rem;
-  }
+
+    margin-bottom:-6.4rem;
+
+    opacity:0;
+
+    animation: envFadeUp 2s ease forwards;
+}
   .env-stage{ width:min(130vw,600px); }
   .envelope{
     position:relative; width:100%; aspect-ratio:475/319; cursor:pointer;
@@ -502,9 +532,33 @@
   text-shadow:0 2px 14px rgba(0,0,0,.65);
   animation:tapPulse 2.4s ease-in-out infinite;
   margin:0;
-  margin-top: -4rem;
+  margin-top: -6rem;
 }
   @keyframes tapPulse{ 0%,100%{opacity:.65} 50%{opacity:1} }
+  @keyframes fadeOnly{
+  from{
+    opacity:0;
+  }
+
+  to{
+    opacity:1;
+  }
+}
+  @keyframes envFadeUp{
+
+    0%{
+        opacity:0;
+        transform:translateY(40px);
+        filter:blur(8px);
+    }
+
+    100%{
+        opacity:1;
+        transform:translateY(0);
+        filter:blur(0);
+    }
+    
+}
   body.locked{ overflow:hidden; height:100svh; }
 </style>
 </head>
@@ -790,133 +844,6 @@ const CONFIG = {
   }
   tick();
   setInterval(tick, 1000);
-})();
-
-
-/* ---------- 3D scene: drifting petals + light motes (Three.js) ---------- */
-(function scene(){
-  var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var isMobile = window.matchMedia('(max-width:768px)').matches;
-
-  var canvas = document.getElementById('bg');
-  var renderer = new THREE.WebGLRenderer({ canvas:canvas, alpha:true, antialias:!isMobile });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
-  renderer.setSize(window.innerWidth, window.innerHeight);
-
-  var scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0xeef0e8, 0.018);
-
-  var camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 200);
-  camera.position.set(0,0,30);
-
-  /* --- soft round texture for light motes (drawn on a canvas) --- */
-  function makeMote(){
-    var c = document.createElement('canvas'); c.width=c.height=64;
-    var x=c.getContext('2d');
-    var g=x.createRadialGradient(32,32,0,32,32,32);
-    g.addColorStop(0,'rgba(255,255,255,1)');
-    g.addColorStop(.25,'rgba(220,230,210,.8)');
-    g.addColorStop(1,'rgba(180,200,165,0)');
-    x.fillStyle=g; x.fillRect(0,0,64,64);
-    return new THREE.CanvasTexture(c);
-  }
-  /* --- petal shape texture --- */
-  function makePetal(){
-    var c = document.createElement('canvas'); c.width=c.height=128;
-    var x=c.getContext('2d');
-    x.translate(64,64);
-    var grd=x.createLinearGradient(0,-50,0,50);
-    grd.addColorStop(0,'#dce4d2'); grd.addColorStop(1,'#9caE8e');
-    x.fillStyle=grd;
-    x.beginPath();
-    x.moveTo(0,-46);
-    x.bezierCurveTo(34,-34, 30,34, 0,48);
-    x.bezierCurveTo(-30,34, -34,-34, 0,-46);
-    x.fill();
-    return new THREE.CanvasTexture(c);
-  }
-
-  /* --- mote particle field --- */
-  var moteCount = isMobile ? 320 : 700;
-  var mGeo = new THREE.BufferGeometry();
-  var mPos = new Float32Array(moteCount*3);
-  for(var i=0;i<moteCount;i++){
-    mPos[i*3]   = (Math.random()-0.5)*90;
-    mPos[i*3+1] = (Math.random()-0.5)*90;
-    mPos[i*3+2] = (Math.random()-0.5)*70 - 10;
-  }
-  mGeo.setAttribute('position', new THREE.BufferAttribute(mPos,3));
-  var motes = new THREE.Points(mGeo, new THREE.PointsMaterial({
-    size: isMobile?0.7:0.55, map:makeMote(), transparent:true,
-    depthWrite:false, blending:THREE.AdditiveBlending, opacity:.9, color:0xffffff
-  }));
-  scene.add(motes);
-
-  /* --- drifting petals (textured planes) --- */
-  var petalCount = isMobile ? 26 : 60;
-  var petalTex = makePetal();
-  var petalMat = new THREE.MeshBasicMaterial({ map:petalTex, transparent:true, side:THREE.DoubleSide, opacity:.92, depthWrite:false });
-  var petalGeo = new THREE.PlaneGeometry(1.4,1.6);
-  var petals = [];
-  for(var p=0;p<petalCount;p++){
-    var m = new THREE.Mesh(petalGeo, petalMat);
-    m.position.set((Math.random()-0.5)*70,(Math.random()-0.5)*80,(Math.random()-0.5)*40);
-    m.rotation.set(Math.random()*6,Math.random()*6,Math.random()*6);
-    var sc = 0.7+Math.random()*1.3; m.scale.set(sc,sc,sc);
-    m.userData = {
-      vx:(Math.random()-0.5)*0.01,
-      vy:-0.012-Math.random()*0.02,
-      rx:(Math.random()-0.5)*0.01,
-      ry:(Math.random()-0.5)*0.012,
-      sway:Math.random()*6
-    };
-    scene.add(m); petals.push(m);
-  }
-
-  /* --- interaction: mouse + scroll parallax --- */
-  var mouseX=0, mouseY=0, scrollY=0;
-  window.addEventListener('mousemove', function(e){
-    mouseX=(e.clientX/window.innerWidth-0.5);
-    mouseY=(e.clientY/window.innerHeight-0.5);
-  });
-  window.addEventListener('scroll', function(){ scrollY = window.scrollY; });
-
-  var t=0;
-  function animate(){
-    requestAnimationFrame(animate);
-    t += prefersReduced ? 0.002 : 0.008;
-
-    /* motes gently rotate as a field */
-    motes.rotation.y = t*0.04;
-    motes.rotation.x = Math.sin(t*0.1)*0.05;
-
-    /* petals drift & tumble */
-    for(var i=0;i<petals.length;i++){
-      var m=petals[i], u=m.userData;
-      m.position.x += u.vx + Math.sin(t+u.sway)*0.004;
-      m.position.y += u.vy;
-      m.rotation.x += u.rx;
-      m.rotation.y += u.ry;
-      if(m.position.y < -42){ m.position.y = 42; m.position.x=(Math.random()-0.5)*70; }
-    }
-
-    /* camera flies forward through the field as you scroll + reacts to mouse */
-    var scrollMax = Math.max(document.body.scrollHeight - window.innerHeight, 1);
-    var prog = scrollY / scrollMax;
-    camera.position.z = 30 - prog*26;          /* dive through the petals */
-    camera.position.x += (mouseX*6 - camera.position.x)*0.04;
-    camera.position.y += (-mouseY*6 - camera.position.y)*0.04;
-    camera.lookAt(0, -prog*4, 0);
-
-    renderer.render(scene,camera);
-  }
-  animate();
-
-  window.addEventListener('resize', function(){
-    camera.aspect = window.innerWidth/window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  });
 })();
 
 
