@@ -448,12 +448,14 @@
 
   /* ============ ENVELOPE INTRO (opening screen) ============ */
   #env-overlay{
-    position:fixed; inset:0; z-index:50;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:clamp(1.4rem,4.2vh,2.8rem);
-    padding:6vh 7vw; text-align:center;
-    background:#0a0d09; overflow:hidden;
-  }
+  position:fixed; inset:0; z-index:50;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:2rem;
+  padding:4vh 7vw;
+  text-align:center;
+  background:#0a0d09;
+  overflow:hidden;
+}
   #env-overlay::before{                 /* the calla-lily photo */
     content:""; position:absolute; inset:0; z-index:0;
     background:var(--lily) center/cover no-repeat;
@@ -465,16 +467,22 @@
   #env-overlay > *{ position:relative; z-index:2; }
 
   #env-overlay .env-eyebrow{
-    font-family:'Jost',sans-serif; letter-spacing:.42em; text-transform:uppercase;
-    font-size:clamp(.6rem,2.6vw,.8rem); color:#f3efe7;
-    text-shadow:0 2px 14px rgba(0,0,0,.65);
-  }
+  font-family:'Jost',sans-serif;
+  letter-spacing:.42em;
+  text-transform:uppercase;
+  font-size:clamp(.6rem,2.6vw,.8rem);
+  color:#f3efe7;
+  text-shadow:0 2px 14px rgba(0,0,0,.65);
+  margin:0;
+}
+
   .env-title{
     font-family:'Great Vibes','Pinyon Script',cursive; color:#fff; font-weight:400;
     font-size:clamp(2.7rem,13vw,5.4rem); line-height:1;
     text-shadow:0 4px 28px rgba(0,0,0,.55);
+    margin-bottom: -2rem;
   }
-  .env-stage{ width:min(82vw,380px); }
+  .env-stage{ width:min(130vw,600px); }
   .envelope{
     position:relative; width:100%; aspect-ratio:475/319; cursor:pointer;
     transition:transform .5s ease;
@@ -486,11 +494,16 @@
     background:var(--env) center/contain no-repeat;
   }
   .tap-hint{
-    font-family:'Jost',sans-serif; letter-spacing:.34em; text-transform:uppercase;
-    font-size:clamp(.6rem,2.6vw,.78rem); color:#f3efe7;
-    text-shadow:0 2px 14px rgba(0,0,0,.65);
-    animation:tapPulse 2.4s ease-in-out infinite;
-  }
+  font-family:'Jost',sans-serif;
+  letter-spacing:.34em;
+  text-transform:uppercase;
+  font-size:clamp(.6rem,2.6vw,.78rem);
+  color:#f3efe7;
+  text-shadow:0 2px 14px rgba(0,0,0,.65);
+  animation:tapPulse 2.4s ease-in-out infinite;
+  margin:0;
+  margin-top: -4rem;
+}
   @keyframes tapPulse{ 0%,100%{opacity:.65} 50%{opacity:1} }
   body.locked{ overflow:hidden; height:100svh; }
 </style>
